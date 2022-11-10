@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.css">
     <title>Document</title>
 </head>
 <body>
+    <div class="container">
+        <div class=""></div>
+    </div>
     <form action="" method="POST">
         <input type="text" name="emp_id" placeholder="Employe ID">
         <br>
@@ -22,8 +26,12 @@
         <input type="submit" name="submit" value="create">
    
     </form>
+    <script src="../js/bootstrap.js"></script>
 </body>
 </html>
+
+
+
 
 <?php 
 

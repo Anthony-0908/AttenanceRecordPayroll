@@ -4,15 +4,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.css">
     <title>Attendance Login</title>
 </head>
 <body>
-    <form action="#" method="POST">
-        <input type="text" name="employee_id" placeholder=" Employee id">
-        <br>
-        <input type="password" name="password" placeholder="Password">
-        <br>
-        <input type="submit" name="time_in" value="Time in">
+
+<div class="text-center">
+
+</div>
+    <form  style="max-width:300px; margin:auto; margin-top:150px;"  action="#" method="POST">
+   
+    <h1 class="h3 mb-3">Employee Login</h1>
+        <label class="sr-only">Employee ID</label>
+        <input type="text" class="form-control" name="employee_id"  placeholder=" Employee id">
+        <div class="mt-3" style="margin-left:40px;">
+            <input type="submit" name="time_in" value="Time in" class="btn btn-lg btn-primary btn-block text-center">
+
+            <input type="submit" name="time_out" value="Time out" class="btn btn-lg btn-primary btn-block">
+        </div>
+        
 
         <!-- <input type="submit" name="time_out" value="Time out"> -->
     </form>
@@ -21,6 +31,15 @@
     <form action="" method="POST">
 
     </form>
+
+
+    <script src="../js/bootstrap.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+
+    <script>
+        
+    </script>
+
     
 
     <?php
@@ -36,7 +55,7 @@
 
 
     if(isset($_POST['time_in'])){
-        if(empty($_POST['employee_id']) || empty($_POST['password'])){
+        if(empty($_POST['employee_id'])){
             echo '<script>alert("Both fields are empty")</script>';
 
         }else{
@@ -46,27 +65,16 @@
             $Workdate = date("Y-m-d");
 
             $Time_in = 1;
+            $Time_out = 2;
 
             $Employee_id = mysqli_real_escape_string($conn , $_POST['employee_id']);
 
-            $Password = mysqli_real_escape_string($conn, $_POST['password']);
+        
 
             $Login = "SELECT  * FROM employee_tbl WHERE  Emp_id = '$Employee_id' ";
             $result = mysqli_query($conn , $Login);
 
             if(mysqli_num_rows($result) > 0 ) { 
-                while($row = mysqli_fetch_assoc($result)){
-                    if(password_verify($Password , $row['Password'])){
-
-                        $_SESSION['id'] = $row['id'];
-
-                        // header('location:Home.php');
-
-
-
-                    }
-                }
-
                 $Insert_Time_in = "INSERT INTO attendance(emp_id , Date , Time, Log_type) VALUES ('$Employee_id', '$Workdate' , '$Timein', '$Time_in')";
 
                 $Query = mysqli_query($conn , $Insert_Time_in);
@@ -77,9 +85,53 @@
                 else{
                     echo "<script>alert('Record not Inserted')</script>";
                 }
+
+                    }
+                }
+
+
+               
+
+               
             }
-        }
-    }
+
+            if(isset($_POST['time_out'])){
+                if(empty($_POST['employee_id'])){
+                    echo '<script>alert("Both fields are empty")</script>';
+        
+                }else{
+        
+                     date_default_timezone_set("Asia/Manila");
+                    $Timein = date("H:i:s");
+                    $Timeout = date("H:i:s");
+                    $Workdate = date("Y-m-d");
+        
+                    $Time_out = 2;
+        
+                    $Employee_id = mysqli_real_escape_string($conn , $_POST['employee_id']);
+        
+                
+        
+                    $Login = "SELECT  * FROM employee_tbl WHERE  Emp_id = '$Employee_id' ";
+                    $result = mysqli_query($conn , $Login);
+        
+                    if(mysqli_num_rows($result) > 0 ) { 
+                        $Insert_Time_out = "INSERT INTO attendance(emp_id , Date , Time_out, Log_type) VALUES ('$Employee_id', '$Workdate' , '$Timeout', '$Time_out')";
+        
+                        $Query_out = mysqli_query($conn , $Insert_Time_out);
+        
+                        if(($Query_out) == 1 ) { 
+                            echo "<script>alert('You already clocked out  ')</script>";
+                        }
+                        else{
+                            echo "<script>alert('Record not Inserted')</script>";
+                        }
+        
+                            }
+                        }
+            }
+        
+    
 
     
 

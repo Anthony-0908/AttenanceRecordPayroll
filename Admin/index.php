@@ -8,14 +8,22 @@
     <title>Admin login</title>
 </head>
 <body>
+<div class="text-center">
+    <form style="max-width:300px; margin:auto; margin-top:150px;" action="" method="POST">
+        <h1 class="h3 mb-3">Login Admin</h1>
+        <label class="sr-only">Username</label>
+        <input type="text" name="admin" class="form-control">
 
-<form action="" method="POST">
-    <input type="text" name="admin" placeholder="Username">
-    <br>
-    <input type="password" name="password" placeholder="Password">
+        <label for="password" class="sr-only">Password</label>
 
-    <input type="submit" name="login" value="login">
+        <input type="password" name="password" class="form-control">
+
+        <div class="mt-3">
+            <button name="login" class="btn btn-lg btn-primary btn-block">Sign in</button>
+        </div>
 </form>
+    </div>
+
 
 
 
