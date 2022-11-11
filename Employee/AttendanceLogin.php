@@ -1,3 +1,125 @@
+
+  <?php
+    // session_start();
+    include('../connection.php');
+
+    if(isset($_POST['attendance'])){
+        date_default_timezone_set('Asia/Manila');
+        $time = date("h:i:s");
+        $today = date("D - F d, Y");
+        $date = date("Y-m-d");
+        $in = date("H:i:s");
+        $out = "14:00:00";
+
+        $code = $_POST['operation'];
+
+        if($code == "time-in"){
+            $id = $_POST['employee_id'];
+            $Password = $_POST['password'];
+
+            $sql_id = "SELECT * FROM employee_tbl WHERE Emp_id ='$id'";
+            $result = mysqli_query($conn, $sql_id);
+
+            if(mysqli_num_rows($result) > 0 ){ 
+                while($row_login = mysqli_fetch_assoc($result)) { 
+                    if(!password_verify($Password , $row_login['Password'])){
+
+                        echo "this credential is wrong ";
+                        // $_SESSION['id'] = $row_login['id'];
+                        // header('Location:Home.php');
+                        
+                    }
+                    else{
+                        echo "this credential is right";
+                        $sql2 = "SELECT * FROM attendance WHERE emp_id = '$id' and attendance_date ='$date'";
+                        $result_attendance = mysqli_query($conn , $sql2);
+                        if(!$row2 = $result_attendance->fetch_assoc()){
+                            $fname = $row_login['Firstname'];
+                            $lname = $row_login['Lastname'];
+                            $full = $lname. ',' . $fname;
+
+                            $first = new DateTime($in);
+                            $second = new DateTime($out);
+                            $interval = $first->diff($second);
+                            $hrs = $interval->format('%h');
+                            $mins = $interval->format('%i');
+                            $mins = $mins/60;
+                            $int = $hrs + $mins;
+                            if($int > 4){
+                            $int = $int - 1;
+                            }
+
+                            
+
+                            $sql_timein = "INSERT INTO attendance(emp_id , full_name, attendance_date , time_in, time_out, hours) VALUES ('$id', '$full', '$date', '$in' , '$out', '$int')";
+
+                            $result3 = mysqli_query($conn , $sql_timein);
+                            echo "time in: $full";
+
+                    
+
+                        }
+                        else{
+                            echo "You alread have time in ";
+                        }
+
+
+
+                    }
+                }
+            }
+        }
+
+        if($code == "time-out"){
+            $id =$_POST['employee_id'];
+            $Password = $_POST['password'];
+
+            $sql_id2 = "SELECT * FROM employee_tbl WHERE Emp_id = '$id'";
+
+            $result_timeout = mysqli_query($conn , $sql_id2);
+
+            if(mysqli_num_rows($result_timeout) > 0 ) { 
+                while($row_logout = mysqli_fetch_assoc($result_timeout)){
+                    if(!password_verify($Password , $row_logout['Password'])){
+                        echo "This credential is wrong";
+                    }
+                    else{
+                        $query = "SELECT * FROM attendance WHERE emp_id = '$id' AND attendance_date ='$date'";
+                        $queryres = mysqli_query($conn , $query);
+                        while($rowres = mysqli_fetch_array($queryres)){
+                            $timein = $row_login['time_in'];
+                        }
+
+                        $first = new DateTime($timein);
+                        $second = new DateTime($out);
+                        $interval = $first->diff($second);
+                        $hrs = $interval->format('%h');
+                        $mins = $interval->format('%i');
+                        $mins = $mins/60;
+                        $int = $hrs + $mins;
+                        if($int > 4){
+                            $int = $int - 1;
+                        }
+
+                        $sql_timeout = "UPDATE attendance SET time_out ='$out' , hours ='$int' WHERE emp_id ='$id' AND attendance_date ='$date'";
+
+                        $result_timeout = mysqli_query($conn, $sql_timeout);
+                        echo "You have timed out";
+                        header("location:AttendanceLogin.php");
+                    }
+                }
+            }
+        }
+
+
+
+
+
+    }
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,130 +134,49 @@
 <div class="text-center">
 
 </div>
-    <form  style="max-width:300px; margin:auto; margin-top:150px;"  action="#" method="POST">
+<div>
+    <p id="date"><?php echo $today;?></p>
+    <p id="time" class="bold"><?php echo $time;?></p>
+</div>
+    <form id="formdata" style="max-width:300px; margin:auto; margin-top:150px;"  action="" method="POST">
    
     <h1 class="h3 mb-3">Employee Login</h1>
         <label class="sr-only">Employee ID</label>
         <input type="text" class="form-control" name="employee_id"  placeholder=" Employee id">
-        <div class="mt-3" style="margin-left:40px;">
-            <input type="submit" name="time_in" value="Time in" class="btn btn-lg btn-primary btn-block text-center">
 
-            <input type="submit" name="time_out" value="Time out" class="btn btn-lg btn-primary btn-block">
+        <input type="password" class="form-control mt-3" name="password" placeholder="password">
+      
+        <div class="input-group mt-3 mb-3">
+          <select name="operation" class="form-control">
+            <option value="time-in">Time In</option>
+            <option value="time-out">Time Out</option>
+          </select>
         </div>
+
+        <input type="submit" class="btn btn-primary btn-block" name="attendance" value="Submit">
         
 
         <!-- <input type="submit" name="time_out" value="Time out"> -->
     </form>
-
-
-    <form action="" method="POST">
-
-    </form>
-
-
     <script src="../js/bootstrap.js"></script>
+    <script src="../Employee/plugins/moment/moment.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-
-    <script>
-        
+    <script type="text/javascript">
+      var interval = setInterval(function() {
+   var momentNow = moment();
+   $('#date').html(momentNow.format('dddd').substring(0,3).toUpperCase() + ' - ' + momentNow.format('MMMM DD, YYYY'));
+   $('#time').html(momentNow.format('hh:mm:ss A'));
+ }, 100);
     </script>
 
+
+  
+
+
+   
     
 
-    <?php
-
-// $time = "06:58:00";
-// $time2 = "0:40:00";
-
-// $secs = strtotime($time2)-strtotime("00:00:00");
-// echo $result = date("H:i:s",strtotime($time)+$secs);
-
-    include('../connection.php');
-
-
-
-    if(isset($_POST['time_in'])){
-        if(empty($_POST['employee_id'])){
-            echo '<script>alert("Both fields are empty")</script>';
-
-        }else{
-
-             date_default_timezone_set("Asia/Manila");
-            $Timein = date("H:i:s");
-            $Workdate = date("Y-m-d");
-
-            $Time_in = 1;
-            $Time_out = 2;
-
-            $Employee_id = mysqli_real_escape_string($conn , $_POST['employee_id']);
-
-        
-
-            $Login = "SELECT  * FROM employee_tbl WHERE  Emp_id = '$Employee_id' ";
-            $result = mysqli_query($conn , $Login);
-
-            if(mysqli_num_rows($result) > 0 ) { 
-                $Insert_Time_in = "INSERT INTO attendance(emp_id , Date , Time, Log_type) VALUES ('$Employee_id', '$Workdate' , '$Timein', '$Time_in')";
-
-                $Query = mysqli_query($conn , $Insert_Time_in);
-
-                if(($Query) == 1) { 
-                    echo "<script>alert('You already clocked in ')</script>";
-                }
-                else{
-                    echo "<script>alert('Record not Inserted')</script>";
-                }
-
-                    }
-                }
-
-
-               
-
-               
-            }
-
-            if(isset($_POST['time_out'])){
-                if(empty($_POST['employee_id'])){
-                    echo '<script>alert("Both fields are empty")</script>';
-        
-                }else{
-        
-                     date_default_timezone_set("Asia/Manila");
-                    $Timein = date("H:i:s");
-                    $Timeout = date("H:i:s");
-                    $Workdate = date("Y-m-d");
-        
-                    $Time_out = 2;
-        
-                    $Employee_id = mysqli_real_escape_string($conn , $_POST['employee_id']);
-        
-                
-        
-                    $Login = "SELECT  * FROM employee_tbl WHERE  Emp_id = '$Employee_id' ";
-                    $result = mysqli_query($conn , $Login);
-        
-                    if(mysqli_num_rows($result) > 0 ) { 
-                        $Insert_Time_out = "INSERT INTO attendance(emp_id , Date , Time_out, Log_type) VALUES ('$Employee_id', '$Workdate' , '$Timeout', '$Time_out')";
-        
-                        $Query_out = mysqli_query($conn , $Insert_Time_out);
-        
-                        if(($Query_out) == 1 ) { 
-                            echo "<script>alert('You already clocked out  ')</script>";
-                        }
-                        else{
-                            echo "<script>alert('Record not Inserted')</script>";
-                        }
-        
-                            }
-                        }
-            }
-        
-    
-
-    
-
-?>
+  
     
 </body>
 </html>
