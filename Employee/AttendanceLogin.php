@@ -8,8 +8,8 @@
         $time = date("h:i:s");
         $today = date("D - F d, Y");
         $date = date("Y-m-d");
-        $in = date("H:i:s");
-        $out = "14:00:00";
+        $in = "6:00:00";
+        $out = "20:00:00";
 
         $code = $_POST['operation'];
 
@@ -45,11 +45,7 @@
                             $mins = $interval->format('%i');
                             $mins = $mins/60;
                             $int = $hrs + $mins;
-                            if($int > 4){
-                            $int = $int - 1;
-                            }
-
-                            
+                           
 
                             $sql_timein = "INSERT INTO attendance(emp_id , full_name, attendance_date , time_in, time_out, hours) VALUES ('$id', '$full', '$date', '$in' , '$out', '$int')";
 
@@ -89,17 +85,15 @@
                         while($rowres = mysqli_fetch_array($queryres)){
                             $timein = $row_login['time_in'];
                         }
-
-                        $first = new DateTime($timein);
+                        //the constant variable should be $timein this is only a test drive 
+                        $first = new DateTime($in);
                         $second = new DateTime($out);
-                        $interval = $first->diff($second);
+                        $interval = $second->diff($first);
                         $hrs = $interval->format('%h');
                         $mins = $interval->format('%i');
                         $mins = $mins/60;
                         $int = $hrs + $mins;
-                        if($int > 4){
-                            $int = $int - 1;
-                        }
+                        
 
                         $sql_timeout = "UPDATE attendance SET time_out ='$out' , hours ='$int' WHERE emp_id ='$id' AND attendance_date ='$date'";
 
@@ -135,8 +129,8 @@
 
 </div>
 <div>
-    <p id="date"><?php echo $today;?></p>
-    <p id="time" class="bold"><?php echo $time;?></p>
+    <p id="date"></p>
+    <p id="time" class="bold"></p>
 </div>
     <form id="formdata" style="max-width:300px; margin:auto; margin-top:150px;"  action="" method="POST">
    
