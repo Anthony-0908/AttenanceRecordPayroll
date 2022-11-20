@@ -67,18 +67,11 @@
                             <?php echo $Row['holiday_overtime'];?>
                         </td>
                         <td>
-                            <!-- <a href="Time.php?id_time=<?= $Row['id']?>" >Time id</a> -->
-                            <form action="Extrapay.php" method="GET">
-                                <input type="hidden" name="edit_id" value="<?php echo $Row['id']?>">
-                                <button type="submit" name="pay">Extra pay</button>
-                            </form>
+                            
                         </td>
 
                         <td>
-                            <form action="AddTime.php" method="GET">
-                                <input type="hidden" name="add_id" value="<?php echo $Row['id'];?>">
-                                <button type="submit" name="addTime">Sum time</button>
-                            </form>
+                            
 
 
                         </td>

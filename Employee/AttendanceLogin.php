@@ -8,10 +8,15 @@
         $time = date("h:i:s");
         $today = date("D - F d, Y");
         $date = date("Y-m-d");
-        $in = "6:00:00";
-        $out = "20:00:00";
+        $in = date("h:i:s");
+        $out = date("h:i:s");
+
+        // $time_in = "7:00:00";
+        // $time_out = "20:00:00";
 
         $code = $_POST['operation'];
+
+        $output = array('error'=>false);
 
         if($code == "time-in"){
             $id = $_POST['employee_id'];
@@ -33,7 +38,10 @@
                         echo "this credential is right";
                         $sql2 = "SELECT * FROM attendance WHERE emp_id = '$id' and attendance_date ='$date'";
                         $result_attendance = mysqli_query($conn , $sql2);
-                        if(!$row2 = $result_attendance->fetch_assoc()){
+                        if(mysqli_num_rows($result_attendance)> 0 ){
+                            echo "You have timed in for today";
+                        }
+                        elseif(!$row2 = $result_attendance->fetch_assoc()){
                             $fname = $row_login['Firstname'];
                             $lname = $row_login['Lastname'];
                             $full = $lname. ',' . $fname;
@@ -47,16 +55,16 @@
                             $int = $hrs + $mins;
                            
 
-                            $sql_timein = "INSERT INTO attendance(emp_id , full_name, attendance_date , time_in, time_out, hours) VALUES ('$id', '$full', '$date', '$in' , '$out', '$int')";
+                            $sql_timein = "INSERT INTO attendance(emp_id , full_name, attendance_date , time_in) VALUES ('$id', '$full', '$date', '$in')";
 
                             $result3 = mysqli_query($conn , $sql_timein);
-                            echo "time in: $full";
+                            echo "<script>alert('time in: $full')</script>";
 
                     
 
                         }
                         else{
-                            echo "You alread have time in ";
+                            echo "<script>alert('You alread have time in')</script> ";
                         }
 
 
@@ -77,7 +85,7 @@
             if(mysqli_num_rows($result_timeout) > 0 ) { 
                 while($row_logout = mysqli_fetch_assoc($result_timeout)){
                     if(!password_verify($Password , $row_logout['Password'])){
-                        echo "This credential is wrong";
+                        echo "<script>alert('Your credential is wrong')</script>";
                     }
                     else{
                         $query = "SELECT * FROM attendance WHERE emp_id = '$id' AND attendance_date ='$date'";
@@ -98,7 +106,7 @@
                         $sql_timeout = "UPDATE attendance SET time_out ='$out' , hours ='$int' WHERE emp_id ='$id' AND attendance_date ='$date'";
 
                         $result_timeout = mysqli_query($conn, $sql_timeout);
-                        echo "You have timed out";
+                       echo "<script>alert('You have Timed out')</script>";
                         header("location:AttendanceLogin.php");
                     }
                 }
@@ -129,12 +137,15 @@
 
 </div>
 <div>
-    <p id="date"></p>
-    <p id="time" class="bold"></p>
-</div>
-    <form id="formdata" style="max-width:300px; margin:auto; margin-top:150px;"  action="" method="POST">
    
-    <h1 class="h3 mb-3">Employee Login</h1>
+    
+</div>
+    <form id="formdata"  style="max-width:300px; margin-bottom:200px; margin:auto; margin-top:150px;"  action="" method="POST">
+   
+    <div class="text-center mx-auto">
+        <p id="date" style="margin-top:50x;"></p>
+        <p id="time" class="bold"></p>
+    </div>
         <label class="sr-only">Employee ID</label>
         <input type="text" class="form-control" name="employee_id"  placeholder=" Employee id">
 

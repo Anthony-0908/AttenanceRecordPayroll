@@ -11,18 +11,25 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
     <title>Employee Table </title>
 </head>
+
+<?php include('includes/navbar.php');?>
+
 <body>
-    <a href="Timetbl.php">Attendance</a>
-    <table id="example" class="table table-striped" style="width:100%">
+    <a href="createEmployee.php" class="btn btn-primary">Add Employee</a>
+    
+    <table id="example" class="table table-striped " style="width:100%; ">
         <thead>
         <tr>
             <th>ID</th>
             <th>Employee ID</th>
             <th>Position</th>
+            <th>Hour rate</th>
             <th>Firstname</th>
             <th>Lastname</th>
             <th>Edit</th>
             <th>Delete</th>
+            <th>Payroll</th>
+            <th>Payslip</th>
         </tr>
         </thead>
         <tbody>
@@ -44,6 +51,7 @@
                         <td>
                             <?php echo $Row['Position'];?>
                         </td>
+                        <td><?php echo $Row['hour_rate']?></td>
                         <td>
                             <?php echo $Row['Firstname']?>
                         </td>
@@ -54,16 +62,24 @@
                         <td>
                             <form action="editEmployee.php" method="POST">
                                 <input type="hidden" name="edit_id" value="<?php echo $Row['id']?>">
-                                <button type="submit" name="edit_employee">Edit Employee</button>
+                                <button type="submit" class="btn btn-success" name="edit_employee">Edit Employee</button>
                             </form>
                         </td>
 
                         <td>
                             <form action="deleteEmployee.php" method="POST">
                                 <input type="hidden" name="delete_id" value="<?php echo $Row['id']?>"> 
-                                <button type="submit" name="delete_employee">Delete Employee</button>
+                                <button type="submit" class="btn btn-danger" name="delete_employee">Delete Employee</button>
                             </form>
                         </td>
+
+                        <td>
+                            <a class="btn btn-outline-dark" href="pay.php?id=<?php echo $Row['Emp_id'];?>">Payroll</a>
+                        </td>
+
+                        <td>
+                            <a class="btn btn-outline-primary" href="generatepayslip.php?payroll_id=<?php echo $Row['Emp_id'];?>">Payslip</a>
+                    </td>
                     </tr>
 
                     <?php

@@ -24,12 +24,19 @@
         </thead>
         <tbody>
             <?php
+
+                
+                $id = $_GET['id'];
+
                 include('../connection.php');
-                $Querytable = "SELECT * FROM attendance";
+                $Querytable = "SELECT * FROM attendance WHERE emp_id = '$id'";
                 $Queryrun = mysqli_query($conn, $Querytable);
 
                 while($Row = mysqli_fetch_assoc($Queryrun)){
                     ?>
+
+
+            
 
                     <tr>
                         <td>
@@ -58,18 +65,18 @@
 
                         <form action="#" method="POST">
                         <td>
+                            <input type="checkbox" name="night_diffirential" value="1">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="overtime" value="1"> 
+                        </td>
+                        <td>
+                            <input type="checkbox" name="holiday" value="1"> 
+                        </td>
 
-                            <input type="checkbox" name="extra[1]" value="1"> 
-                            </td>
-                            <input type="checkbox" name="extra[]" value="1"> 
-                            <td>
-
-                            </td>
-
-                            <td>
-                            <input type="checbox" name="extra"
-                            <?php echo $Row['holiday_overtime'];?>
-                            </td>
+                        <td>
+                            <input type="checbox" name="holiday_overtime" value="1">
+                        </td>
                             <td>
 
                         </form>
@@ -81,6 +88,7 @@
 
                     <?php
                 }
+            
 
             ?>
         </tbody>
