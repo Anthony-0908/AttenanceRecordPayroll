@@ -15,9 +15,11 @@
 <?php include('includes/navbar.php');?>
 
 <body>
-    <a href="createEmployee.php" class="btn btn-primary">Add Employee</a>
+   
     
-    <table id="example" class="table table-striped " style="width:100%; ">
+    <div class="container" style="margin-top:20px;">
+    <a href="createEmployee.php" class="btn btn-primary mb-4">Add Employee</a>
+    <table id="example" class="table table-striped " style="width:100%;  ">
         <thead>
         <tr>
             <th>ID</th>
@@ -89,6 +91,8 @@
         </tbody>
         
     </table>
+    </div>
+   
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>

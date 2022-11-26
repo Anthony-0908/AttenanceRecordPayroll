@@ -9,7 +9,9 @@
         $today = date("D - F d, Y");
         $date = date("Y-m-d");
         $in = date("h:i:s");
-        $out = date("h:i:s");
+        $out ="21:00:00";
+        $overtime = date("h:i:s");
+
 
         // $time_in = "7:00:00";
         // $time_out = "20:00:00";
@@ -91,8 +93,18 @@
                         $query = "SELECT * FROM attendance WHERE emp_id = '$id' AND attendance_date ='$date'";
                         $queryres = mysqli_query($conn , $query);
                         while($rowres = mysqli_fetch_array($queryres)){
-                            $timein = $row_login['time_in'];
+                            // $timein = $row_login['time_in'];
                         }
+                        
+                        $first = new DateTime($in);
+                        $second = new DateTime($out);
+                        $interval = $second->diff($first);
+                        $hrs = $interval->format('%h');
+                        $mins = $interval->format('%i');
+                        $mins = $mins/60;
+                        $int = $hrs + $mins;
+
+                        $sql_timeout = "UPDATE attendance SET time_out ='$out' , hours ='$int' WHERE emp_id ='$id' AND attendance_date ='$date'";
                         //the constant variable should be $timein this is only a test drive 
                         $first = new DateTime($in);
                         $second = new DateTime($out);
@@ -101,23 +113,43 @@
                         $mins = $interval->format('%i');
                         $mins = $mins/60;
                         $int = $hrs + $mins;
-                        
 
-                        $sql_timeout = "UPDATE attendance SET time_out ='$out' , hours ='$int' WHERE emp_id ='$id' AND attendance_date ='$date'";
+                        if($out >= "19:00:00"){
+                            $first = new DateTime("19:00:00");
+                            $second = new DateTime($out);
+                            $interval = $second->diff($first);
+                            $hrs_worked = $interval->format('%h');
+                            $mins = $interval->format('%i');
+                            $mins = $mins/60;
+                            $over_int = $hrs_worked + $mins;
 
-                        $result_timeout = mysqli_query($conn, $sql_timeout);
-                       echo "<script>alert('You have Timed out')</script>";
-                        header("location:AttendanceLogin.php");
+                            $sql_timeout_overtime = "INSERT INTO overtime(emp_id , overtime, hrs_worked , dateWorkedOvertime) Values('$id','$out', '$over_int', '$date')";
+                            $result_overtime = mysqli_query($conn , $sql_timeout_overtime);
+
+                            echo "You have timed out";
+
+                        }
+
+
+
+                            $result_timeout = mysqli_query($conn, $sql_timeout);
+                           echo "<script>alert('You have Timed out')</script>";
+                            header("location:AttendanceLogin.php");
+                        }
+                            
+
+                        }
+
                     }
                 }
             }
-        }
+        
 
 
 
 
 
-    }
+    
 
 
 ?>

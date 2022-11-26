@@ -43,16 +43,16 @@ $from = date('Y-m-d', strtotime('-15day', strtotime($to)));
 
 // $Sql_time = "SELECT *, SUM(hours) AS total_hrs, attendance.emp_id, attendance.full_name, employee_tbl.Position,employee_tbl.Emp_id AS emp_id FROM attendance LEFT JOIN employee_tbl ON employee_tbl.Emp_id = attendance.emp_id WHERE attendance.emp_id = '$id'";
 // $Sql = "SELECT  payroll.total_hrs, payroll.emp_id , payroll.date_to , payroll.date_from, payroll.payroll_number, payroll.SSS, payroll.pagibig, payroll.philhealth, payroll.taxes , payroll.net_pay FROM payroll LEFT JOIN attendance ON payroll.emp_id = attendance.emp_id WHERE payroll.emp_id = '$id'";
-$Sql = "SELECT * FROM payroll   WHERE emp_id = '$id' AND date_to = '$to' AND date_from = '$from'";
+$Sql = "SELECT * ,  employee_tbl.hour_rate FROM employee_tbl LEFT JOIN payroll ON payroll.emp_id = employee_tbl.Emp_id  WHERE payroll.emp_id = '$id' ";
 $query = mysqli_query($conn, $Sql);
 
-$Sql_rate = "SELECT employee_tbl.hour_rate FROM employee_tbl LEFT JOIN payroll ON payroll.emp_id = employee_tbl.Emp_id WHERE payroll.emp_id = '$id'";
-$query_rate = mysqli_query($conn, $Sql_rate);
-$row = mysqli_fetch_array($query_rate);
+// $Sql_rate = "SELECT employee_tbl.hour_rate FROM employee_tbl LEFT JOIN payroll ON payroll.emp_id = employee_tbl.Emp_id WHERE payroll.emp_id = '$id'";
+// $query_rate = mysqli_query($conn, $Sql_rate);
+// $row = mysqli_fetch_array($query_rate);
 while($rows = mysqli_fetch_array($query)){ 
 
 $sss = $rows['SSS'];
-$pagibig = $rows['pag-ibig'];
+$pagibig = $rows['pagibig'];
 $philhealth = $rows['philhealth'];
 
 
@@ -78,36 +78,85 @@ $html.='
         <h4>Pay period</h4>
         <p style="margin-top:-40px; margin-left:90px;">'.$rows['date_from'].' - '.$rows['date_to'].'</p>
     </div>
-
+    <p style="font-style:bold; margin-left:600px;">'.$rows['payroll_number'].'</p>
     <table>
+   
     <tr>
-        <td>Basic wage</td>
-        <td>'.$row['hour_rate'].'</td>
+        <td>Basic salary</td>
+        <td>14,500</td>
+        <td></td>
     </tr>
 
     <tr>
     <td>Gross Salary</td>
     <td></td>
     <td>'.$rows['salary'].'</td>
+    
     </tr>
+
+   
+    <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    </tr>
+
+    <tr>
+    <td>Overtime Pay</td>
+    <td>'.$rows['overtime_pay'].'</td>
+    <td>&nbsp;</td>
+    </tr>
+
+     
+    <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    </tr>
+
+    <tr>
+    <td>SSS</td>
+    <td>'.$rows['SSS'].'</td>
+    <td>&nbsp;</td>
+    </tr>
+
+    <tr>
+    <td>Pag-ibig</td>
+    <td>'.$rows['pagibig'].'</td>
+    <td>&nbsp;</td>
+    </tr>
+
+    <tr>
+    <td>Philhealth</td>
+    <td>'.$rows['philhealth'].'</td>
+    <td>&nbsp;</td>
+    </tr>
+
+    <tr>
+    <td>Taxes</td>
+    <td>'.$rows['taxes'].'</td>
+    <td>&nbsp;</td>
+    </tr>
+
+    <tr>
+    <td>Total Deduction</td>
+    <td>'.$total_deductions .'</td>
+    <td>&nbsp;</td>
+    </tr>
+
+    <tr>
+    <td>Net Pay</td>
+    <td>'.$rows['net_pay'].'</td>
+    <td>&nbsp;</td>
+    </tr>
+
     </table>
 
-    <div class="text-align:left">
-        <label></label>
-    </div>
-    <h2>'.$rows['total_hrs'].'</h2>
     
    
-    <h2>'.$rows['salary'].'</h2>
-    <h2>'.$rows['date_to'].'</h2>
-    <h2>'.$rows['date_from'].'</h2>
-    <h2>'.$rows['payroll_number'].'</h2>
-    <h2>'.$rows['SSS'].'</h2>
-    <h2>'.$rows['pagibig'].'</h2>
-    <h2>'.$rows['phihealth'].'</h2>
-    <h2>'.$rows['taxes'].'</h2>
-    <h2>'.$rows['net_pay'].'</h2>
-
+   
+    
+    
     <h2></h2>
     </div>
 

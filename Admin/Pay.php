@@ -15,11 +15,10 @@
 	date_default_timezone_set($timezone);
 
     $range_to = date('m/d/Y');
-    $range_from = date('m/d/Y', strtotime('+15 day', strtotime($range_to)));
+    $range_from = date('m/d/Y', strtotime('-15 day', strtotime($range_to)));
 ?>
 
-<input type="text" class="pull-right col-lg-3" id="reservation" name="date_range" value="<?php echo (isset($_GET['range'])) ? $_GET['range'] : $range_to.' - '.$range_from; ?>">
-   
+
       
 
         <?php
@@ -36,33 +35,42 @@ if(isset($_GET['range'])){
     $to = date('Y-m-d',strtotime($ex[1]));
 
 }
-$Sql_time = "SELECT *, SUM(hours) AS total_hrs, attendance.emp_id, attendance.full_name, employee_tbl.Position,employee_tbl.Emp_id AS emp_id FROM attendance LEFT JOIN employee_tbl ON employee_tbl.Emp_id = attendance.emp_id WHERE attendance.emp_id = '$id'";
+
+// "SELECT SUM(overtime.hrs_worked) AS overtime_hrs, SUM(attendance.hours) AS hours_worked, attendance.emp_id , employee_tbl.Position, attendance.full_name, attendance.attendance_date  FROM attendance LEFT JOIN overtime ON overtime.emp_id = attendance.emp_id LEFT JOIN employee_tbl ON attendance.emp_id = employee_tbl.Emp_id  WHERE attendance.emp_id = '$id'";
+
+$Sql_time = "SELECT *, SUM(attendance.hours) AS total_hrs, SUM(overtime.hrs_worked) AS overtime_hrs, attendance.emp_id, attendance.full_name, employee_tbl.Position,employee_tbl.Emp_id AS emp_id  FROM attendance LEFT JOIN employee_tbl ON employee_tbl.Emp_id = attendance.emp_id LEFT JOIN overtime ON overtime.emp_id = attendance.emp_id WHERE attendance.emp_id = '$id' AND  attendance.attendance_date BETWEEN '$from' AND '$to' AND overtime.DateWorkedOvertime  BETWEEN '$from' AND '$to' ";
 
 $query = mysqli_query($conn, $Sql_time);
 $total = 0;
 while($row = mysqli_fetch_assoc($query)){
     $fullname = $row['full_name'];
+   $Overtimepay = ($row['hour_rate'] * 0.25) * $row['overtime_hrs'] ;
 
     $emp_id = $row['Emp_id'];
-    $total_hrs = $row['total_hrs'];
+    $total_hrs = $row['total_hrs']; 
+    $Overtimehours = $row['overtime_hrs'];
 
-    $gross = $row['hour_rate'] * $row['total_hrs'];
+    $TotalHours = $total_hrs + $Overtimehours;
+
+    $gross = $row['hour_rate'] * $TotalHours;
+
+    $total_gross = $gross + $Overtimepay;
 
 
    
    
-    if($gross <= 1500){
-        $pag_ibig = $gross *0.01;
+    if($total_gross <= 1500){
+        $pag_ibig = $total_gross *0.01;
 
     }else{
-        $pag_ibig = $gross * 0.02;
+        $pag_ibig = $total_gross * 0.02;
     }
 
-    $phil_health = $gross * 0.04;
+    $phil_health = $total_gross * 0.04;
 
-    $sss = $gross * 0.04;
+    $sss = $total_gross * 0.04;
     $total_deductions = $phil_health + $pag_ibig + $sss ;
-    $net = $gross - $total_deductions;
+    $net = $total_gross - $total_deductions;
 
     $taxes = $net * 24;
 
@@ -94,8 +102,13 @@ while($row = mysqli_fetch_assoc($query)){
 
 
     <form action="#" method="POST">
-        <div class="col-lg-6 mx-auto border border-light">
+        <div class="col-lg-6 mx-auto border border-dark rounded pt-2 bg-light">
             <h2 class="bg-dark text-white">Payroll</h2>
+            <div class="mb-3">
+            <input type="text" class="form-control pull-right col-lg-3 text-center" id="reservation" name="date_range" value="<?php echo (isset($_GET['range'])) ? $_GET['range'] : $range_from.' - '.$range_to; ?>">
+            </div>
+
+            
             <div class="mb-3">
                 <label>Full name</label>
                 <input type="text" class="form-control" name="full_name" readonly value="<?php echo $fullname;?>">
@@ -114,12 +127,21 @@ while($row = mysqli_fetch_assoc($query)){
 
             <div class="mb-3">
             <label>Total hours</label>
-            <input type="text"  class="form-control"  name="total_hrs" readonly value="<?php echo number_format($total_hrs , 2)?>">
+            <input type="text"  class="form-control"  name="total_hrs" readonly value="<?php echo number_format($TotalHours , 2)?>">
             </div>
+
+
+            
+            <div class="mb-3">
+            <label>Total Overtime Pay </label>
+            <input type="text"  class="form-control"  name="overtime_pay" readonly value="<?php echo number_format($Overtimepay , 2)?>">
+            </div>
+
+            
 
             <div class="mb-3">
             <label>Gross</label>
-                <input type="text" class="form-control" name="gross" readonly value="<?php echo number_format($gross,2)?>">
+                <input type="text" class="form-control" name="gross" readonly value="<?php echo number_format($total_gross,2)?>">
             </div>
 
             <div class="mb-3">
@@ -176,8 +198,9 @@ while($row = mysqli_fetch_assoc($query)){
         $Emp_id = $_POST['emp_id'];
         $full_name = $_POST['full_name'];
         $total_hrs = $_POST['total_hrs'];
+        $overtimepay = $_POST['overtime_pay'];
         $payroll_number = $_POST['payrollnumber'];
-        $gross = $_POST['gross'];
+        $total_gross = $_POST['gross'];
         $sss = $_POST['sss'];
         $phil_health = $_POST['philhealth'];
         $pag_ibig = $_POST['pag-ibig'];
@@ -195,7 +218,7 @@ while($row = mysqli_fetch_assoc($query)){
 
         }
         else{
-            $Payroll = "INSERT INTO payroll (emp_id, full_name, total_hrs, date_to, date_from, payroll_number, salary, SSS , pagibig, philhealth, taxes , net_pay, DateTimeCreated, DateTimeUpdated) VALUES('$Emp_id' , '$full_name', '$total_hrs', '$to','$from','$payroll_number', '$gross', '$sss', '$pag_ibig','$phil_health', '$inc_taxes', '$net_pay', '$dateTimeCreated' , '$dateTimeUpdated')";
+            $Payroll = "INSERT INTO payroll (emp_id, full_name, total_hrs, overtime_pay, date_to, date_from, payroll_number, salary, SSS , pagibig, philhealth, taxes , net_pay, DateTimeCreated, DateTimeUpdated) VALUES('$Emp_id' , '$full_name', '$total_hrs', '$overtimepay', '$to','$from','$payroll_number', '$total_gross', '$sss', '$pag_ibig','$phil_health', '$inc_taxes', '$net_pay', '$dateTimeCreated' , '$dateTimeUpdated')";
             $Payroll_query = mysqli_query($conn , $Payroll);
     
             if(($Payroll_query)) {

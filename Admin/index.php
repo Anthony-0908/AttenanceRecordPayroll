@@ -30,8 +30,9 @@
 
 <script src="../js/bootstrap.js"></script>
 <?php
-include('../connection.php');
 session_start();
+include('../connection.php');
+
 
 
 if(isset($_POST['login'])){
@@ -51,7 +52,7 @@ if(isset($_POST['login'])){
         if($sql->num_rows > 0 ) { 
             $row = mysqli_fetch_assoc($sql);
 
-            $_SESSION['admin'] = $row['admin'];
+            $_SESSION['username'] = $row['username'];
             header('location: home.php');
 
 
