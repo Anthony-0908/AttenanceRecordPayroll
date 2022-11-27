@@ -31,17 +31,17 @@
                 while($row_login = mysqli_fetch_assoc($result)) { 
                     if(!password_verify($Password , $row_login['Password'])){
 
-                        echo "this credential is wrong ";
+                        echo "<script>alert('this credential is wrong')</script> ";
                         // $_SESSION['id'] = $row_login['id'];
                         // header('Location:Home.php');
                         
                     }
                     else{
-                        echo "this credential is right";
+                        echo "<script>alert('this credential is right')</script>";
                         $sql2 = "SELECT * FROM attendance WHERE emp_id = '$id' and attendance_date ='$date'";
                         $result_attendance = mysqli_query($conn , $sql2);
                         if(mysqli_num_rows($result_attendance)> 0 ){
-                            echo "You have timed in for today";
+                            echo "<script>alert('You have timed in for today')</script>";
                         }
                         elseif(!$row2 = $result_attendance->fetch_assoc()){
                             $fname = $row_login['Firstname'];
@@ -60,7 +60,7 @@
                             $sql_timein = "INSERT INTO attendance(emp_id , full_name, attendance_date , time_in) VALUES ('$id', '$full', '$date', '$in')";
 
                             $result3 = mysqli_query($conn , $sql_timein);
-                            echo "<script>alert('time in: $full')</script>";
+                            echo "<script>alert('time in: $full. $today')</script>";
 
                     
 
@@ -113,6 +113,11 @@
                         $mins = $interval->format('%i');
                         $mins = $mins/60;
                         $int = $hrs + $mins;
+                        
+
+                        $result_timeout = mysqli_query($conn, $sql_timeout);
+                        echo "<script>alert('You have Timed out')</script>";
+                        header("location:AttendanceLogin.php");
 
                         if($out >= "19:00:00"){
                             $first = new DateTime("19:00:00");
@@ -126,15 +131,16 @@
                             $sql_timeout_overtime = "INSERT INTO overtime(emp_id , overtime, hrs_worked , dateWorkedOvertime) Values('$id','$out', '$over_int', '$date')";
                             $result_overtime = mysqli_query($conn , $sql_timeout_overtime);
 
-                            echo "You have timed out";
 
+                            $res_overtime = "SELECT * FROM overtime WHERE emp_id = '$id' AND dateWorkedOvertime = '$date'";
+                            $query_overtime = mysqli_query($conn, $res_overtime);
+                            if(mysqli_num_rows($query_overtime) > 0 ) { 
+                                echo "<script>alert('You already time in your overtime')</script>";
+                                header('Location:AttendanceLogin.php');
+                            }
                         }
 
 
-
-                            $result_timeout = mysqli_query($conn, $sql_timeout);
-                           echo "<script>alert('You have Timed out')</script>";
-                            header("location:AttendanceLogin.php");
                         }
                             
 
